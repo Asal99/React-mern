@@ -1,0 +1,82 @@
+import { useEffect, useState } from "react";
+import { ProductCard } from "../../ProductCard";
+
+export const NewsLists = () => {
+  const [articles, setArticles] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("business");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(
+          `https://newsapi.org/v2/top-headlines?country=us&category=${selectedCategory}&apiKey=07fe6c17b56f4345b1c6003bcae87cae`,
+        );
+
+        const result = await response.json();
+
+        if (result.status !== "ok") {
+          throw new Error(result.message);
+        }
+
+        setArticles(result.articles);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, [selectedCategory]);
+
+  return (
+    <>
+      {/* CATEGORY BUTTONS */}
+      <div className="flex gap-4 mb-6 flex-wrap">
+        {[
+          "business",
+          "technology",
+          "sports",
+          "entertainment",
+          "health",
+          "science",
+        ].map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`p-3 rounded ${
+              selectedCategory === category
+                ? "bg-black text-white"
+                : "bg-gray-300"
+            }`}
+          >
+            {category.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {/* LOADING / ERROR */}
+      {loading && <h2>Loading news...</h2>}
+      {error && <h2>Error: {error}</h2>}
+
+      {/* NEWS LIST */}
+      {!loading &&
+        !error &&
+        articles.map((item, index) => (
+          <div key={index} className="mb-6">
+            {item.urlToImage && (
+              <img src={item.urlToImage} alt="" className="w-full max-w-md" />
+            )}
+            <h3 className="text-lg font-semibold">{item.title}</h3>
+
+            {/* Optional reusable card */}
+          </div>
+        ))}
+    </>
+  );
+};
