@@ -228,6 +228,7 @@ export const BlogPage = () => {
                 </Link>
               </div>
             </div>
+            
           </div>
         ))}
       </div>
